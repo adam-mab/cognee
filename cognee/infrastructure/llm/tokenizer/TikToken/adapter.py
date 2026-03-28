@@ -17,11 +17,12 @@ class TikTokenTokenizer(TokenizerInterface):
     ):
         self.model = model
         self.max_completion_tokens = max_completion_tokens
-        # Initialize TikToken for GPT based on model
         if model:
-            self.tokenizer = tiktoken.encoding_for_model(self.model)
+            try:
+                self.tokenizer = tiktoken.encoding_for_model(self.model)
+            except KeyError:
+                self.tokenizer = tiktoken.get_encoding("cl100k_base")
         else:
-            # Use default if model not provided
             self.tokenizer = tiktoken.get_encoding("cl100k_base")
 
     def extract_tokens(self, text: str) -> List[Any]:

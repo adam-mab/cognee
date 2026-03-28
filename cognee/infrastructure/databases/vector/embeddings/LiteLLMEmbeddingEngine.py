@@ -13,6 +13,7 @@ from tenacity import (
     before_sleep_log,
 )
 import litellm
+litellm.drop_params = True
 import os
 from urllib.parse import urlparse
 import httpx
@@ -136,8 +137,9 @@ class LiteLLMEmbeddingEngine(EmbeddingEngine):
                         "api_base": self.endpoint,
                         "api_version": self.api_version,
                     }
-                    # Pass through target embedding dimensions when supported
-                    if self.dimensions is not None:
+                    # Only pass dimensions for native OpenAI endpoints;
+                    # local/compatible servers (LM Studio, etc.) reject it.
+                    if self.dimensions is not None and self.endpoint is None:
                         embedding_kwargs["dimensions"] = self.dimensions
 
                     # Ensure each attempt does not hang indefinitely
